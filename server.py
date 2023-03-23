@@ -5,6 +5,7 @@ import os
 HOST='0.0.0.0'
 PORT=8080
 BUFFER_SIZE=4096
+SEPARATOR="<SEPARATOR>"
 
 serversocket=socket.socket()
 serversocket.bind((HOST,PORT))
@@ -13,8 +14,8 @@ serversocket.listen()
 
 clientsocket,address=serversocket.accept()
 print(f"{address} connected..")
-received=clientsocket.recv(BUFFER_SIZE).decode('utf-8')
-filename,filesize=received.split()
+filename=clientsocket.recv(BUFFER_SIZE).decode('utf-8')
+filesize=clientsocket.recv(BUFFER_SIZE).decode('utf-8')
 filename=os.path.basename(filename)
 filesize=int(filesize)
 
@@ -26,4 +27,4 @@ with open (filename,"wb") as f:
             break
         f.write(bytes_read)
         progress.update(len(bytes_read))
-        
+
