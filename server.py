@@ -30,7 +30,6 @@ if msg=="post":
                 break
             f.write(bytes_read)
             progress.update(len(bytes_read))
-    sys.exit()
 elif msg=="get":
     print("No getting bro..")
 
