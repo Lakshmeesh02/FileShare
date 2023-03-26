@@ -26,7 +26,7 @@ if msg=="post":
             clientsocket.sendall(bytes_read)
             progress.update(len(bytes_read))
 
-elif msg=="get":
+elif msg=="get":    # to get a file from the server
     filename=input("File to receive: ")
     clientsocket.send(f"{filename}".encode('utf-8'))
     filesize=int(clientsocket.recv(BUFFER_SIZE).decode('utf-8'))
