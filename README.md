@@ -1,5 +1,5 @@
 # FileShare
-File sharing using socket programming
+File sharing using socket programming in python
 
 1) Save the server.py file in a different folder
 2) The folder which contains client.py file must have a file to send to the server
