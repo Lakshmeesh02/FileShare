@@ -25,7 +25,25 @@ if msg=="post":
                 break
             clientsocket.sendall(bytes_read)
             progress.update(len(bytes_read))
+
 elif msg=="get":
-    print("no getting yet..")
+    filename=input("File to receive: ")
+    clientsocket.send(f"{filename}".encode('utf-8'))
+    filesize=int(clientsocket.recv(BUFFER_SIZE).decode('utf-8'))
+    if filesize==0:
+        print("File not present..")
+    else:
+        print("File present and retrieving..")
+        progress=tqdm.tqdm(range(filesize), f"receiving {filename}", unit="B", unit_scale=True, unit_divisor=1024)
+        with open (filename,"wb") as f:
+            while 1:
+                bytes_read=clientsocket.recv(BUFFER_SIZE)
+                if not bytes_read:
+                    break
+                f.write(bytes_read)
+                progress.update(len(bytes_read))
+
+else:
+    print("Invalid command..")
             
 
