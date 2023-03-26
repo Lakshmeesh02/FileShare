@@ -30,6 +30,27 @@ if msg=="post":
                 break
             f.write(bytes_read)
             progress.update(len(bytes_read))
+
 elif msg=="get":
-    print("No getting bro..")
+    filename=clientsocket.recv(BUFFER_SIZE).decode('utf-8')
+    try:
+        filesize=int(os.path.getsize(filename))
+    except:
+        filesize=0
+    if filesize==0:
+        clientsocket.send(f"{filesize}".encode('utf-8'))
+    else:
+        clientsocket.send(f"{filesize}".encode('utf-8'))
+        progress=tqdm.tqdm(range(filesize), f"sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
+        with open(filename,"rb") as f:
+            while 1:
+                bytes_read=f.read(BUFFER_SIZE)
+                if not bytes_read:
+                    break
+                clientsocket.sendall(bytes_read)
+                progress.update(len(bytes_read))
+
+
+
+
 
