@@ -1,50 +1,56 @@
 import socket
-import tqdm
 import os
-import sys
+import tqdm
 
-BUFFER_SIZE=4096
-HOST='127.0.0.1'
-PORT=8080
+clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host = '192.168.201.65'
+port = 12000
+clientsocket.connect((host, port))
 
-clientsocket=socket.socket()
-clientsocket.connect((HOST,PORT))
-print("Connected to server..")
-msg=input("Type 'get' to download files and 'post' to upload files..")
-clientsocket.send(msg.encode('utf-8'))
+command = input("Enter command get/post: ")
+clientsocket.send(command.encode())
 
-if msg=="post":         # send file to server
-    filename=input("File to upload: ")
-    filesize=os.path.getsize(filename)
-    clientsocket.send(f"{filename}".encode('utf-8'))    
-    clientsocket.send(f"{filesize}".encode('utf-8'))
-    progress=tqdm.tqdm(range(filesize), f"sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
-    with open(filename,"rb") as f:      # read data chunks from the file and send them to server
-        while 1:
-            bytes_read=f.read(BUFFER_SIZE)
-            if not bytes_read:
+if command == "get":
+    # get file name from user
+    filename = input("Enter file name: ")
+    clientsocket.send(filename.encode())
+
+    # receive file size from server
+    filesize = int(clientsocket.recv(1024).decode())
+    print(f"File size: {filesize} bytes")
+
+    progress=tqdm.tqdm(range(filesize), f"sending {filename}", unit='B', unit_scale=True, unit_divisor=1024)
+    # receive file data from server
+    with open(filename, 'wb') as f:
+        while filesize > 0:
+            data = clientsocket.recv(1024)
+            f.write(data)
+            filesize -= len(data)
+            progress.update(data)
+
+    print(f"Received file: {filename}")
+
+elif command == "post":
+    # get file name from user
+    filename = input("Enter file name: ")
+    clientsocket.send(filename.encode())
+
+    # send file size to server
+    filesize = os.path.getsize(filename)
+    clientsocket.send(str(filesize).encode())
+
+    progress=tqdm.tqdm(range(filesize), f"sending {filename}", unit='B', unit_scale=True, unit_divisor=1024)
+    # send file data to server
+    with open(filename, 'rb') as f:
+        while True:
+            data = f.read(1024)
+            if not data:
                 break
-            clientsocket.sendall(bytes_read)
-            progress.update(len(bytes_read))
+            clientsocket.send(data)
+            progress.update(data)
 
-elif msg=="get":    # to get a file from the server
-    filename=input("File to receive: ")    
-    clientsocket.send(f"{filename}".encode('utf-8'))         # give the filename to server
-    filesize=int(clientsocket.recv(BUFFER_SIZE).decode('utf-8'))    # receive the filesize of the file present in the server
-    if filesize==0:     # file not present in the server
-        print("File not present..")
-    else:       # file present in the server
-        print("File present and retrieving..")
-        progress=tqdm.tqdm(range(filesize), f"receiving {filename}", unit="B", unit_scale=True, unit_divisor=1024)
-        with open (filename,"wb") as f:     # create a file and write the data received from the server.
-            while 1:
-                bytes_read=clientsocket.recv(BUFFER_SIZE)
-                if not bytes_read:
-                    break
-                f.write(bytes_read)
-                progress.update(len(bytes_read))
-
+    print(f"Sent file: {filename}")
 else:
-    print("Invalid command..")
-            
+    print("Unknown command")
 
+clientsocket.close()
