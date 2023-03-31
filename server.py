@@ -18,9 +18,11 @@ while True:
     if command == "get":
         # receive file name from client
         filename = clientsocket.recv(1024).decode()
+
         # send file size to client
         filesize = os.path.getsize(filename)
         clientsocket.send(str(filesize).encode())
+
         # send file data to client
         with open(filename, 'rb') as f:
             while True:
@@ -28,21 +30,25 @@ while True:
                 if not data:
                     break
                 clientsocket.send(data)
+        print("sent bro!!!")
 
-    '''
     elif command == "post":
         # receive file name from client
         filename = clientsocket.recv(1024).decode()
+
         # receive file size from client
-        filesize = int(clientsocket.recv(1024).decode())
+        #filesize = int(clientsocket.recv(1024).decode())
+
         # receive file data from client
         with open(filename, 'wb') as f:
-            while filesize > 0:
+            while 1:
                 data = clientsocket.recv(1024)
+                if not data:
+                    break
                 f.write(data)
-                filesize -= len(data)
+                #filesize -= len(data)
+        print("received bro!!!!")
     else:
         print("Unknown command")
-        '''
 
     clientsocket.close()
