@@ -5,6 +5,7 @@ serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = '192.168.201.65'
 port = 12000
 serversocket.bind((host, port))
+print(host,port)
 serversocket.listen()
 
 while True:
