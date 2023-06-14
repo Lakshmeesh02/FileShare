@@ -2,8 +2,8 @@ import socket
 import os
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = '192.168.201.65'
-port = 12000
+host = '192.168.136.228'
+port = 12002
 serversocket.bind((host, port))
 print(host,port)
 serversocket.listen()
