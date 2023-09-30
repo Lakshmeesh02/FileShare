@@ -4,8 +4,8 @@ import tqdm
 import time
 
 clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = '192.168.136.34'
-port = 1000
+host = '10.30.205.70'
+port = 12003
 clientsocket.connect((host, port))
 
 command = input("Enter command get/post: ")
